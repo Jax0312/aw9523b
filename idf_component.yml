@@ -1,4 +1,4 @@
-version: "1.0.0"
+version: "1.0.1"
 description: "Library for AW9523B IO Expander"
 url: "https://github.com/Jax0312/aw9523b.git"
 license: "GPL-3.0-only"

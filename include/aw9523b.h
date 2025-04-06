@@ -1,4 +1,4 @@
-#include "driver/i2c.h"
+#include "driver/i2c_master.h"
 #include <stdint.h>
 
 #define AW9523B_I2C_ADDR  0x58  // Default I2C address
@@ -17,11 +17,10 @@
 #define AW9523B_REG_GCR 0x11
 
 typedef struct {
-    i2c_port_t i2c_port;
-    uint8_t address;
+    i2c_master_dev_handle_t dev_handle;
 } aw9523b_t;
 
-esp_err_t aw9523b_init(aw9523b_t *dev, i2c_port_t i2c_port, uint8_t address);
+esp_err_t aw9523b_init(aw9523b_t *dev, i2c_master_bus_handle_t *bus_handle, uint8_t address);
 esp_err_t aw9523b_set_pin_mode(aw9523b_t *dev, uint8_t pin, gpio_mode_t mode);
 esp_err_t aw9523b_set_all_mode(aw9523b_t *dev, gpio_mode_t mode);
 esp_err_t aw9523b_write_pin(aw9523b_t *dev, uint8_t pin, bool value);

@@ -1,20 +1,27 @@
 #include "include/aw9523b.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
 
 static const char *TAG = "AW9523B";
 
 static esp_err_t aw9523b_write_register(aw9523b_t *dev, uint8_t reg, uint8_t value) {
     uint8_t data[2] = {reg, value};
-    return i2c_master_write_to_device(dev->i2c_port, dev->address, data, 2, 1000 / portTICK_PERIOD_MS);
+    return i2c_master_transmit(dev->dev_handle, data, 2, 1000 / portTICK_PERIOD_MS);
 }
 
 static esp_err_t aw9523b_read_register(aw9523b_t *dev, uint8_t reg, uint8_t *value) {
-    return i2c_master_write_read_device(dev->i2c_port, dev->address, &reg, 1, value, 1, 1000 / portTICK_PERIOD_MS);
+    return i2c_master_transmit_receive(dev->dev_handle, &reg, 1, value, 1, 1000 / portTICK_PERIOD_MS);
 }
 
-esp_err_t aw9523b_init(aw9523b_t *dev, i2c_port_t i2c_port, uint8_t address) {
-    dev->i2c_port = i2c_port;
-    dev->address = address;
+esp_err_t aw9523b_init(aw9523b_t *dev, i2c_master_bus_handle_t *bus_handle, uint8_t address) {
+
+    i2c_device_config_t dev_cfg = {
+        .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+        .device_address = address,
+        .scl_speed_hz = 400000,
+    };
+
+    ESP_ERROR_CHECK(i2c_master_bus_add_device(*bus_handle, &dev_cfg, &dev->dev_handle));
 
     uint8_t id;
     esp_err_t ret = aw9523b_read_register(dev, AW9523B_REG_ID, &id);
